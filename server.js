@@ -288,7 +288,13 @@ function createChatServer({ database } = {}) {
   return { app, server, io, checkDatabase, close };
 }
 
-if (require.main === module) {
+if (process.env.VERCEL) {
+  // Vercel funkcijas ielādētājam vajadzīgs pats HTTP serveris kā noklusējuma eksports.
+  const vercelChat = createChatServer();
+  void vercelChat.checkDatabase();
+  module.exports = vercelChat.server;
+  module.exports.createChatServer = createChatServer;
+} else if (require.main === module) {
   const chat = createChatServer();
   const port = Number(process.env.PORT || 3000);
   chat.server.listen(port, '0.0.0.0', () => console.log(`✅ Anon Čats darbojas portā ${port}.`));
@@ -305,6 +311,7 @@ if (require.main === module) {
   }
   process.on('SIGTERM', shutdown);
   process.on('SIGINT', shutdown);
+  module.exports = { createChatServer };
+} else {
+  module.exports = { createChatServer };
 }
-
-module.exports = { createChatServer };
