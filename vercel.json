@@ -10,10 +10,6 @@
   ],
   "rewrites": [
     {
-      "source": "/socket.io/:path*",
-      "destination": "/api"
-    },
-    {
       "source": "/health",
       "destination": "/api"
     }
