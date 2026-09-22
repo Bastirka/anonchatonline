@@ -1,6 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "fluid": true,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/index.html",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/socket.io/:path*",
@@ -9,10 +16,6 @@
     {
       "source": "/health",
       "destination": "/api"
-    },
-    {
-      "source": "/",
-      "destination": "/index.html"
     }
   ]
 }
