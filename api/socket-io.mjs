@@ -6,4 +6,3 @@ const chat = createChatServer();
 void chat.checkDatabase();
 
 export default chat.server;
-
