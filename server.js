@@ -275,8 +275,9 @@ function createChatServer({ database } = {}) {
       await pool.query('SELECT code FROM pairs LIMIT 0');
       console.log('✅ Datubāze un pairs tabula ir pieejama.');
       return true;
-    } catch {
-      console.error('❌ Datubāze nav gatava. Pārbaudi DATABASE_URL un pairs tabulu; parastais čats turpina darboties.');
+    } catch (dbError) {
+      const dbCode = typeof dbError?.code === 'string' ? dbError.code : 'UNKNOWN';
+      console.error(`❌ Datubāze nav gatava (${dbCode}). Pārbaudi DATABASE_URL un pairs tabulu; parastais čats turpina darboties.`);
       return false;
     }
   }
