@@ -141,7 +141,7 @@
     'use strict';
     // Vercel WebSocket funkcija neatbalsta Socket.IO sākotnējo HTTP polling transportu.
     const socket = io({
-      path: location.hostname.endsWith('.vercel.app') ? '/api/socket-io/socket.io' : '/socket.io',
+      path: location.hostname.endsWith('.vercel.app') ? '/api/socket-io' : '/socket.io',
       transports: ['websocket']
     });
     const $ = (id) => document.getElementById(id);
