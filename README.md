@@ -69,6 +69,12 @@ SQL shēmai Supabase jābūt izveidotai pirms pilnā scenārija lietošanas. Nav
 
 Blueprint saglabā prasīto Node `18.20.0`; kods ir saderīgs ar Node ≥18. Vajadzības gadījumā `NODE_VERSION` vari nomainīt. [Render Blueprint dokumentācija](https://render.com/docs/blueprint-spec).
 
+## Izvietošana Vercel
+
+Repozitorijā ir arī `api/index.js` un `vercel.json`. Tie eksportē HTTP/Socket.IO serveri kā Vercel Function un novirza `/socket.io/*` un `/health` pieprasījumus uz šo funkciju. Sākumlapa un citi `public/` faili tiek pasniegti no Vercel CDN.
+
+Vercel projekta **Settings → Environment Variables** pievieno `DATABASE_URL` visām vajadzīgajām vidēm un pēc tam veic jaunu deployment. WebSocket atbalsts Vercel pašlaik ir publiskā beta. Savienojums tiek piesaistīts vienai Function instancei, bet nākamais savienojums var nonākt citā instancē. Tādēļ šīs versijas procesa atmiņā glabātais matchmaking ir uzticams uz viena ilgstoša Node procesa (Render), bet Vercel mērogošanas laikā tam vajadzīga kopīga stāvokļa glabātuve, piemēram, Redis. Produkcijai ar garantētu pāru atrašanu izmanto Render konfigurāciju vai pārvieto gaidīšanas rindu uz Redis.
+
 ## Kā tas strādā
 
 - Viens gaidošs savienojums (`waiting`) sagaida nākamo; abiem tiek uzstādīts `socket.partner` un nosūtīts `matched`.
