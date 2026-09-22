@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0f1a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='.9em' font-size='56'%3E%F0%9F%8E%AD%3C/text%3E%3C/svg%3E">
+  <meta name="description" content="Satiec svešinieku un sarunājies anonīmi. Bez reģistrācijas. Ja saikne ir abpusēja, satiecieties vēlreiz ar pāra kodu.">
+  <title>Anon Čats — saruna sākas šeit</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0f0f1a; --panel:#171723; --line:#2c2c3d; --muted:#a3a3b8; --text:#f5f3fa; --accent:#e94560; --green:#2ecc71; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; min-height:100dvh; display:grid; place-items:center; padding:24px 16px; background:radial-gradient(ellipse at 50% 0%,#2c182a 0,transparent 55%),var(--bg); color:var(--text); font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button,input { font:inherit; }
+    button { cursor:pointer; border:0; transition:background .18s,transform .18s; }
+    button:active:not(:disabled) { transform:translateY(1px); }
+    button:disabled { cursor:not-allowed; opacity:.45; }
+    button:focus-visible,input:focus-visible { outline:2px solid #ff91a4; outline-offset:3px; }
+    .hidden { display:none !important; }
+    .app { width:100%; max-width:500px; height:90vh; height:90dvh; max-height:880px; min-height:480px; display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--line); border-radius:16px; background:var(--panel); box-shadow:0 24px 90px #0005; }
+    .app-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:22px 24px; border-bottom:1px solid var(--line); }
+    .brand { font-size:20px; font-weight:750; letter-spacing:-.6px; }
+    .network { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:11px; }
+    .dot { width:6px; height:6px; border-radius:50%; background:#e9ad45; flex-shrink:0; }
+    .network.online .dot { background:var(--green); box-shadow:0 0 9px #2ecc7140; }
+    #notice { margin:12px 16px 0; padding:10px 12px; border:1px solid #e9456060; border-radius:9px; background:#e9456012; color:#ffc3ce; font-size:13px; }
+    #home-screen { flex:1; min-height:0; overflow:auto; display:flex; flex-direction:column; padding:34px 32px 22px; }
+    .eyebrow { color:var(--accent); font-size:10px; font-weight:750; letter-spacing:2.3px; text-transform:uppercase; }
+    .hero { flex:1; display:flex; flex-direction:column; justify-content:center; padding:18px 0 26px; }
+    .hero-icon { width:64px; height:64px; margin-bottom:24px; display:grid; place-items:center; border:1px solid #e9456045; border-radius:21px; background:linear-gradient(135deg,#e9456020,#e9456004); color:#ff8297; }
+    .hero-icon svg { width:30px; height:30px; }
+    h1 { font-size:38px; line-height:1.13; letter-spacing:-1.7px; margin:0 0 16px; font-weight:760; }
+    .intro { color:var(--muted); line-height:1.75; font-size:14px; margin:0 0 26px; max-width:350px; }
+    .primary { background:var(--accent); color:white; border-radius:10px; font-weight:650; padding:14px 18px; }
+    .primary:hover:not(:disabled) { background:#f25973; }
+    #start { display:flex; justify-content:space-between; align-items:center; width:100%; min-height:54px; }
+    .privacy { color:var(--muted); text-align:center; font-size:11px; margin:13px 0 0; }
+    .divider { display:flex; align-items:center; gap:13px; color:#85859c; font-size:11px; margin:0 0 21px; }
+    .divider::before,.divider::after { content:""; flex:1; height:1px; background:var(--line); }
+    .code-label { display:block; font-size:13px; font-weight:600; margin-bottom:10px; }
+    .code-form { display:flex; gap:8px; }
+    input { min-width:0; width:100%; background:#10101b; border:1px solid #343448; border-radius:10px; color:var(--text); padding:13px 14px; font-size:14px; }
+    input::placeholder { color:#75758d; }
+    #code-input { text-transform:uppercase; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; letter-spacing:.5px; }
+    .secondary { padding:12px 18px; color:var(--text); background:#292939; border:1px solid #3a3a4e; border-radius:10px; font-size:13px; font-weight:600; }
+    .secondary:hover:not(:disabled) { background:#353548; }
+    .hint { color:var(--muted); font-size:11px; line-height:1.6; margin:10px 0 0; }
+    .footer { text-align:center; font-size:10px; color:#818196; padding-top:27px; letter-spacing:.2px; }
+    #chat-screen { flex:1; min-height:0; display:flex; flex-direction:column; }
+    .chat-header { padding:15px 18px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    #status { font-size:12px; font-weight:600; overflow-wrap:anywhere; }
+    .text-button { color:var(--muted); background:transparent; padding:8px 5px; font-size:12px; white-space:nowrap; }
+    .text-button:hover { color:var(--text); }
+    #chat { flex:1; min-height:0; overflow-y:auto; padding:20px 18px 8px; display:flex; flex-direction:column; gap:10px; scrollbar-width:thin; scrollbar-color:#414156 transparent; }
+    .msg { flex-shrink:0; max-width:85%; padding:11px 14px; border-radius:14px; font-size:14px; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .msg.me { align-self:flex-end; background:var(--accent); color:white; border-bottom-right-radius:4px; }
+    .msg.them { align-self:flex-start; background:#0f3460; color:#edf3ff; border-bottom-left-radius:4px; }
+    .msg.system { align-self:center; max-width:100%; text-align:center; background:transparent; color:var(--muted); font-size:12px; padding:7px 8px; }
+    .msg.code { align-self:center; max-width:100%; background:#2ecc7115; border:1px solid #2ecc7160; color:var(--green); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:21px; font-weight:700; text-align:center; }
+    #typing { height:28px; padding:3px 20px; font-size:11px; color:var(--muted); }
+    #rating-bar { padding:15px 18px; border-top:1px solid var(--line); background:#1c1c2b; }
+    #rating-bar p { margin:0 0 12px; font-size:13px; text-align:center; }
+    .rating-actions { display:flex; gap:9px; }
+    .rating-actions button { flex:1; border-radius:9px; padding:11px; font-size:13px; font-weight:650; }
+    #rate-yes { background:#2ecc711f; color:#72e7a5; border:1px solid #2ecc7150; }
+    #rate-no { background:#e945601f; color:#ff91a4; border:1px solid #e9456050; }
+    .composer { display:flex; gap:8px; padding:13px 16px 18px; border-top:1px solid var(--line); }
+    .composer .primary { font-size:13px; padding:12px 16px; }
+    #next-actions { display:flex; gap:8px; padding:0 18px 14px; }
+    #next-actions button { flex:1; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    @media (max-width:540px) {
+      body { padding:10px; }
+      .app { height:calc(100dvh - 20px); min-height:0; }
+      .app-header { padding:19px 20px; }
+      #home-screen { padding:24px 24px 20px; }
+      h1 { font-size:35px; }
+      input { font-size:16px; }
+      .hero-icon { margin-bottom:20px; }
+    }
+    @media (max-height:650px) { .hero { padding:8px 0 20px; } .hero-icon { display:none; } .footer { padding-top:16px; } h1 { font-size:30px; } }
+    @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <div class="brand">🎭 Anon Čats</div>
+      <div id="network" class="network" role="status"><span class="dot" aria-hidden="true"></span><span id="network-text">Savienojas…</span></div>
+    </header>
+    <div id="notice" class="hidden" role="alert"></div>
+
+    <section id="home-screen" aria-labelledby="home-title">
+      <div class="eyebrow">Svešinieks. Saruna. Varbūt draugs.</div>
+      <div class="hero">
+        <div class="hero-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 11.5a8 8 0 0 1-8 8H5l-4 3 2-6a8 8 0 1 1 17-5Z" transform="translate(1 -2) scale(.95)"/><path d="M7 10h.01M12 10h.01M17 10h.01" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        <h1 id="home-title">Sarunājies<br>anonīmi</h1>
+        <p class="intro">Otrā pusē ir kāds, kuru vēl nepazīsti.<br>Sāc sarunu un paskaties, kur tā aizvedīs.</p>
+        <button id="start" class="primary" disabled><span>Sākt čatu</span><span aria-hidden="true">↗</span></button>
+        <p class="privacy">Bez vārda. Bez reģistrācijas. Tikai saruna.</p>
+      </div>
+      <div class="divider">jau esat satikušies?</div>
+      <form id="code-form">
+        <label class="code-label" for="code-input">Atgriezies ar pāra kodu</label>
+        <div class="code-form">
+          <input id="code-input" placeholder="ZILA-TIGERIS-42" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" required aria-describedby="code-hint">
+          <button id="join" class="secondary" disabled>Ieiet</button>
+        </div>
+        <p id="code-hint" class="hint">Ja abi sarunu novērtēsiet ar 👍, saņemsiet kopīgu kodu, ar kuru satikties vēlreiz.</p>
+      </form>
+      <div class="footer">Labs sākums ir vienkāršs «čau».</div>
+    </section>
+
+    <section id="chat-screen" class="hidden" aria-label="Anonīma saruna">
+      <div class="chat-header">
+        <div id="status" role="status">Meklē…</div>
+        <button id="end" class="text-button">Beigt sarunu ↗</button>
+      </div>
+      <div id="chat" role="log" aria-live="polite" aria-relevant="additions" aria-label="Sarunas ziņas" tabindex="0"></div>
+      <div id="typing" role="status"></div>
+      <div id="rating-bar" class="hidden">
+        <p>Kā bija saruna?</p>
+        <div class="rating-actions">
+          <button id="rate-yes">👍 Bija labi</button>
+          <button id="rate-no">👎 Nē</button>
+        </div>
+      </div>
+      <div id="next-actions" class="hidden">
+        <button id="next" class="secondary">Jauna saruna</button>
+        <button id="home" class="secondary">Uz sākumu</button>
+      </div>
+      <form id="message-form" class="composer">
+        <label class="sr-only" for="message-input">Tava ziņa</label>
+        <input id="message-input" placeholder="Uzraksti kaut ko…" maxlength="500" autocomplete="off" disabled>
+        <button id="send" class="primary" disabled>Sūtīt</button>
+      </form>
+    </section>
+  </main>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    'use strict';
+    const socket = io();
+    const $ = (id) => document.getElementById(id);
+    let matched = false;
+    let inRoom = null;
+    let roomPartner = false;
+    let mode = 'home';
+    let typingTimer;
+    let remoteTypingTimer;
+    let lastTyping = 0;
+    let joining = false;
+    let savedCode = '';
+
+    function notice(text = '') {
+      $('notice').textContent = text;
+      $('notice').classList.toggle('hidden', !text);
+    }
+
+    function updateControls() {
+      const writable = socket.connected && (matched || (inRoom && roomPartner));
+      $('message-input').disabled = !writable;
+      $('send').disabled = !writable;
+      $('start').disabled = !socket.connected || joining;
+      $('join').disabled = !socket.connected || joining;
+      $('next').disabled = !socket.connected;
+      $('rate-yes').disabled = !socket.connected;
+      $('rate-no').disabled = !socket.connected;
+    }
+
+    function stopTyping() {
+      clearTimeout(typingTimer);
+      clearTimeout(remoteTypingTimer);
+      lastTyping = 0;
+      $('typing').textContent = '';
+      if (socket.connected && (matched || inRoom)) socket.emit('typing', false);
+    }
+
+    function showChat() {
+      notice();
+      $('home-screen').classList.add('hidden');
+      $('chat-screen').classList.remove('hidden');
+      $('rating-bar').classList.add('hidden');
+      $('next-actions').classList.add('hidden');
+      $('chat').replaceChildren();
+      $('message-input').value = '';
+      $('end').textContent = 'Beigt sarunu ↗';
+    }
+
+    function addMessage(text, type) {
+      // Lietotāja saturs vienmēr ir teksts, nevis izpildāms HTML.
+      const element = document.createElement(type === 'code' ? 'button' : 'div');
+      element.className = 'msg ' + type;
+      element.textContent = text;
+      if (type === 'code') {
+        element.type = 'button';
+        element.title = 'Kopēt pāra kodu';
+        element.setAttribute('aria-label', 'Kopēt pāra kodu ' + text);
+        element.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(text);
+            addMessage('✅ Nokopēts!', 'system');
+          } catch {
+            notice('Automātiska kopēšana nav pieejama. Iezīmē kodu un nokopē to manuāli.');
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        };
+      }
+      $('chat').append(element);
+      // Ilgas sarunas neuzkrāj neierobežotu DOM elementu skaitu.
+      while ($('chat').children.length > 500) $('chat').firstElementChild.remove();
+      $('chat').scrollTop = $('chat').scrollHeight;
+    }
+
+    function start() {
+      if (!socket.connected || joining) return;
+      stopTyping();
+      matched = false;
+      inRoom = null;
+      roomPartner = false;
+      mode = 'waiting';
+      showChat();
+      $('status').textContent = 'Meklē…';
+      updateControls();
+      socket.emit('find-partner');
+    }
+
+    function showHome() {
+      stopTyping();
+      if (socket.connected) socket.emit('end-chat');
+      matched = false;
+      inRoom = null;
+      roomPartner = false;
+      mode = 'home';
+      $('chat-screen').classList.add('hidden');
+      $('home-screen').classList.remove('hidden');
+      if (savedCode) $('code-input').value = savedCode;
+      notice();
+      updateControls();
+    }
+
+    function send() {
+      const text = $('message-input').value.slice(0, 500).trim();
+      if (!text || !socket.connected || !(matched || (inRoom && roomPartner))) return;
+      if (inRoom) socket.emit('room-message', { code: inRoom, msg: text });
+      else socket.emit('message', text);
+      addMessage(text, 'me');
+      $('message-input').value = '';
+      stopTyping();
+      $('message-input').focus();
+    }
+
+    function rate(value) {
+      if (!socket.connected) return;
+      socket.emit('rate', { rating: value });
+      $('rating-bar').classList.add('hidden');
+    }
+
+    $('start').onclick = start;
+    $('next').onclick = start;
+    $('home').onclick = showHome;
+    $('rate-yes').onclick = () => rate(1);
+    $('rate-no').onclick = () => rate(-1);
+    $('message-form').onsubmit = (event) => { event.preventDefault(); send(); };
+    $('code-form').onsubmit = (event) => {
+      event.preventDefault();
+      if (!socket.connected || joining) return;
+      const code = $('code-input').value.trim();
+      if (!code || code.length > 20) return notice('Ievadi pāra kodu (līdz 20 rakstzīmēm).');
+      notice();
+      joining = true;
+      $('join').textContent = 'Gaidi…';
+      updateControls();
+      socket.emit('use-code', { code });
+    };
+    $('end').onclick = () => {
+      if (mode === 'waiting' || mode === 'ended') return showHome();
+      stopTyping();
+      if (socket.connected) socket.emit('end-chat');
+      if (inRoom) {
+        inRoom = null;
+        roomPartner = false;
+        mode = 'ended';
+        $('status').textContent = 'Saruna beigusies';
+        addMessage('Tu izgāji no istabas. Ar to pašu kodu vari atgriezties vēlāk.', 'system');
+        $('next-actions').classList.remove('hidden');
+        $('end').textContent = 'Uz sākumu ↗';
+      }
+      matched = false;
+      updateControls();
+    };
+    $('message-input').addEventListener('input', () => {
+      if (!socket.connected || !(matched || (inRoom && roomPartner))) return;
+      clearTimeout(typingTimer);
+      // Bieža rakstīšana nesūta notikumu par katru taustiņu.
+      if (Date.now() - lastTyping > 700) {
+        socket.emit('typing', true);
+        lastTyping = Date.now();
+      }
+      typingTimer = setTimeout(() => { if (socket.connected) socket.emit('typing', false); lastTyping = 0; }, 1500);
+    });
+
+    socket.on('connect', () => {
+      $('network').classList.add('online');
+      $('network-text').textContent = 'Tiešsaistē';
+      notice();
+      updateControls();
+    });
+    socket.on('disconnect', () => {
+      stopTyping();
+      matched = false;
+      inRoom = null;
+      roomPartner = false;
+      joining = false;
+      $('join').textContent = 'Ieiet';
+      $('network').classList.remove('online');
+      $('network-text').textContent = 'Savienojas…';
+      $('rating-bar').classList.add('hidden');
+      if (mode !== 'home') {
+        mode = 'ended';
+        $('status').textContent = '🔴 Savienojums pārtrūkst';
+        addMessage('Savienojums pārtrūka. Pēc atjaunošanas sāc jaunu sarunu vai ieej ar savu kodu.', 'system');
+        $('next-actions').classList.remove('hidden');
+        $('end').textContent = 'Uz sākumu ↗';
+      }
+      updateControls();
+    });
+    socket.on('connect_error', () => {
+      $('network').classList.remove('online');
+      $('network-text').textContent = 'Nav savienojuma';
+      notice('Neizdevās savienoties. Automātiski mēģinām vēlreiz…');
+      updateControls();
+    });
+    socket.on('waiting', () => {
+      mode = 'waiting';
+      $('status').textContent = 'Meklē…';
+      $('end').textContent = 'Atcelt ↗';
+      addMessage('Meklējam tev sarunas biedru. Paliec šeit — saruna sāksies automātiski.', 'system');
+    });
+    socket.on('matched', () => {
+      matched = true;
+      mode = 'paired';
+      $('status').textContent = '🟢 Savienots';
+      $('end').textContent = 'Beigt sarunu ↗';
+      addMessage('Svešinieks ir klāt. Pasaki «čau»! Neizpaud savus personas datus.', 'system');
+      updateControls();
+      $('message-input').focus();
+    });
+    socket.on('message', (msg) => addMessage(msg, 'them'));
+    socket.on('room-message', (msg) => addMessage(msg, 'them'));
+    socket.on('typing', (value) => {
+      clearTimeout(remoteTypingTimer);
+      $('typing').textContent = value ? 'Raksta…' : '';
+      if (value) remoteTypingTimer = setTimeout(() => { $('typing').textContent = ''; }, 2500);
+    });
+    socket.on('partner-left', () => {
+      stopTyping();
+      matched = false;
+      roomPartner = false;
+      if (inRoom) {
+        $('status').textContent = '🔑 ' + inRoom;
+        addMessage('Otrs dalībnieks aizgāja. Vari palikt un sagaidīt viņa atgriešanos.', 'system');
+      } else {
+        mode = 'ended';
+        $('status').textContent = '🔴 Aizgāja';
+        $('end').textContent = 'Uz sākumu ↗';
+        addMessage('Saruna ir beigusies.', 'system');
+        $('next-actions').classList.remove('hidden');
+      }
+      updateControls();
+    });
+    socket.on('show-rating', () => { if (mode === 'ended') $('rating-bar').classList.remove('hidden'); });
+    socket.on('waiting-rating', () => addMessage('Tavs vērtējums saņemts. Gaidām otru vērtējumu (līdz 2 minūtēm)…', 'system'));
+    socket.on('pair-code', (code) => {
+      savedCode = code;
+      $('code-input').value = code;
+      $('rating-bar').classList.add('hidden');
+      addMessage('Abiem patika! Saglabā šo pāra kodu — tas ir jūsu atslēga nākamajai sarunai.', 'system');
+      addMessage(code, 'code');
+      addMessage('Spied uz koda, lai kopētu. Sākumlapā ievadi to laukā «Atgriezies ar pāra kodu». Pēc lapas aizvēršanas kodu neatcerēsimies.', 'system');
+      if (mode === 'home') notice('Saņēmāt pāra kodu: ' + code + '. Saglabā to pirms lapas aizvēršanas.');
+    });
+    socket.on('no-pair', () => {
+      $('rating-bar').classList.add('hidden');
+      addMessage('Pāra kods nav izveidots: vajadzīgi divi 👍, kamēr abi vēl ir pieslēgti. Vari sākt jaunu sarunu.', 'system');
+    });
+    socket.on('in-room', (code) => {
+      joining = false;
+      $('join').textContent = 'Ieiet';
+      stopTyping();
+      showChat();
+      matched = false;
+      inRoom = code;
+      savedCode = code;
+      roomPartner = false;
+      mode = 'room';
+      $('status').textContent = '🔑 ' + code;
+      addMessage('Tu esi pāra istabā. Gaidām otru dalībnieku ar šo kodu.', 'system');
+      updateControls();
+    });
+    socket.on('partner-joined', () => {
+      roomPartner = true;
+      addMessage('🟢 Otrs dalībnieks ir klāt. Varat turpināt sarunu!', 'system');
+      updateControls();
+      $('message-input').focus();
+    });
+    socket.on('error-msg', (msg) => {
+      joining = false;
+      $('join').textContent = 'Ieiet';
+      notice(msg);
+      updateControls();
+    });
+  </script>
+</body>
+</html>
