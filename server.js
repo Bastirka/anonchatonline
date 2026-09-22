@@ -38,7 +38,10 @@ function createChatServer({ database } = {}) {
   const app = express();
   const server = http.createServer(app);
   // Noklusējuma ping/pong saglabāts; paketes izmērs ir ierobežots.
-  const io = new Server(server, { maxHttpBufferSize: 16384 });
+  const io = new Server(server, {
+    path: process.env.VERCEL ? '/api/socket-io/socket.io' : '/socket.io',
+    maxHttpBufferSize: 16384
+  });
   let waiting = null;
   const sessions = new Set();
   app.disable('x-powered-by');
